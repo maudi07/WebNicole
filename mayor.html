@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Libro mayor</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body data-page="mayor">
+  <header class="topbar">
+    <a class="logo" href="index.html">LunaConta</a>
+    <button class="menu-btn" id="menuBtn">☰</button>
+    <nav class="menu" id="menu">
+      <a href="index.html" data-link="inicio">Inicio</a>
+      <a href="catalogo.html" data-link="catalogo">Catálogo</a>
+      <a href="transacciones.html" data-link="transacciones">Asientos</a>
+      <a href="diario.html" data-link="diario">Libro diario</a>
+      <a href="mayor.html" data-link="mayor">Libro mayor</a>
+      <a href="balanza.html" data-link="balanza">Balanza</a>
+      <a href="balance.html" data-link="balance">Balance general</a>
+      <a href="estados.html" data-link="estados">Resultado integral</a>
+    </nav>
+  </header>
+
+  <main class="container">
+    <section class="page-head">
+      <div>
+        <p class="tag">Agrupado por cuenta</p>
+        <h1>Libro mayor</h1>
+        <p>Cargos, abonos y saldo acumulado de cada cuenta.</p>
+      </div>
+    </section>
+
+    <section id="contenedorMayor" class="ledger-list"></section>
+  </main>
+
+  <script src="shared.js"></script>
+</body>
+</html>

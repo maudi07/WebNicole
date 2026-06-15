@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Balance general</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body data-page="balance">
+  <header class="topbar">
+    <a class="logo" href="index.html">LunaConta</a>
+    <button class="menu-btn" id="menuBtn">☰</button>
+    <nav class="menu" id="menu">
+      <a href="index.html" data-link="inicio">Inicio</a>
+      <a href="catalogo.html" data-link="catalogo">Catálogo</a>
+      <a href="transacciones.html" data-link="transacciones">Asientos</a>
+      <a href="diario.html" data-link="diario">Libro diario</a>
+      <a href="mayor.html" data-link="mayor">Libro mayor</a>
+      <a href="balanza.html" data-link="balanza">Balanza</a>
+      <a href="balance.html" data-link="balance">Balance general</a>
+      <a href="estados.html" data-link="estados">Resultado integral</a>
+    </nav>
+  </header>
+
+  <main class="container">
+    <section class="page-head">
+      <div>
+        <p class="tag">Situación financiera</p>
+        <h1>Balance general</h1>
+        <p>Verifica que Activo = Pasivo + Capital.</p>
+      </div>
+    </section>
+
+    <section class="grid two-columns">
+      <article class="card">
+        <h2>Activo</h2>
+        <div id="listaActivo" class="report-list"></div>
+        <div class="total-line"><span>Total activo</span><strong id="totalActivo">$0.00</strong></div>
+      </article>
+      <article class="card">
+        <h2>Pasivo</h2>
+        <div id="listaPasivo" class="report-list"></div>
+        <div class="total-line"><span>Total pasivo</span><strong id="totalPasivo">$0.00</strong></div>
+        <h2 class="mt">Capital</h2>
+        <div id="listaCapital" class="report-list"></div>
+        <div class="total-line"><span>Total capital</span><strong id="totalCapital">$0.00</strong></div>
+        <div class="total-line grand"><span>Pasivo + Capital</span><strong id="totalPasivoCapital">$0.00</strong></div>
+      </article>
+    </section>
+
+    <section class="card balance-check">
+      <h2>Comprobación</h2>
+      <p id="mensajeBalance" class="mensaje"></p>
+    </section>
+  </main>
+
+  <script src="shared.js"></script>
+</body>
+</html>

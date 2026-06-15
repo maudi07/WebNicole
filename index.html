@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inicio | Estados financieros</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body data-page="inicio">
+  <header class="topbar">
+    <a class="logo" href="index.html">LunaConta</a>
+    <button class="menu-btn" id="menuBtn">☰</button>
+    <nav class="menu" id="menu">
+      <a href="index.html" data-link="inicio">Inicio</a>
+      <a href="catalogo.html" data-link="catalogo">Catálogo</a>
+      <a href="transacciones.html" data-link="transacciones">Asientos</a>
+      <a href="diario.html" data-link="diario">Libro diario</a>
+      <a href="mayor.html" data-link="mayor">Libro mayor</a>
+      <a href="balanza.html" data-link="balanza">Balanza</a>
+      <a href="balance.html" data-link="balance">Balance general</a>
+      <a href="estados.html" data-link="estados">Resultado integral</a>
+    </nav>
+  </header>
+
+  <main class="container">
+    <section class="hero">
+      <div>
+        <h1>Estados financieros</h1>
+        <div class="hero-actions">
+          <a class="btn primary" href="transacciones.html">Registrar asiento</a>
+          <a class="btn secondary" href="catalogo.html">Ver catálogo</a>
+        </div>
+      </div>
+      <div class="hero-card">
+        <h3>Comprobación rápida</h3>
+        <p>Activo</p>
+        <strong id="inicioActivo">$0.00</strong>
+        <p>Pasivo + Capital</p>
+        <strong id="inicioPasivoCapital">$0.00</strong>
+        <span id="inicioMensaje" class="pill">Sin datos</span>
+      </div>
+    </section>
+
+    <section class="grid cards-4">
+      <article class="card mini-card">
+        <span class="icon">📒</span>
+        <p>Cuentas</p>
+        <h2 id="totalCuentas">0</h2>
+      </article>
+      <article class="card mini-card">
+        <span class="icon">✍️</span>
+        <p>Asientos</p>
+        <h2 id="totalAsientos">0</h2>
+      </article>
+      <article class="card mini-card">
+        <span class="icon">⬆️</span>
+        <p>Total debe</p>
+        <h2 id="totalDebe">$0.00</h2>
+      </article>
+      <article class="card mini-card">
+        <span class="icon">⬇️</span>
+        <p>Total haber</p>
+        <h2 id="totalHaber">$0.00</h2>
+      </article>
+    </section>
+
+    <section class="card">
+      <div class="section-title">
+        <div>
+          <p class="tag">Resumen</p>
+          <h2>Últimos asientos registrados</h2>
+        </div>
+        <a class="btn small" href="diario.html">Ver libro diario</a>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Fecha</th>
+              <th>Descripción</th>
+              <th>Movimientos</th>
+              <th>Debe</th>
+              <th>Haber</th>
+            </tr>
+          </thead>
+          <tbody id="tablaInicio"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script src="shared.js"></script>
+</body>
+</html>
