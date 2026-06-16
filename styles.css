@@ -185,6 +185,41 @@ select {
   box-shadow: var(--sombra);
 }
 
+.company-card {
+  margin-top: 24px;
+}
+
+.company-preview {
+  display: grid;
+  gap: 4px;
+  min-width: 190px;
+  padding: 12px 14px;
+  border-radius: 18px;
+  background: #f7f2ff;
+  color: var(--suave);
+  font-size: 13px;
+}
+
+.company-preview strong {
+  color: var(--texto);
+  font-size: 16px;
+}
+
+.empresa-grid {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.wide-field {
+  grid-column: span 3;
+}
+
+.page-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
 .mini-card {
   position: relative;
   overflow: hidden;
@@ -852,8 +887,13 @@ tfoot th {
   }
 
   .form-grid,
-  .form-grid.two {
+  .form-grid.two,
+  .empresa-grid {
     grid-template-columns: 1fr 1fr;
+  }
+
+  .wide-field {
+    grid-column: span 2;
   }
 
   .page-head {
@@ -903,8 +943,13 @@ tfoot th {
   }
 
   .form-grid,
-  .form-grid.two {
+  .form-grid.two,
+  .empresa-grid {
     grid-template-columns: 1fr;
+  }
+
+  .wide-field {
+    grid-column: span 1;
   }
 
   .section-title {
@@ -912,8 +957,10 @@ tfoot th {
     align-items: start;
   }
 
-  .actions-right {
+  .actions-right,
+  .page-actions {
     flex-direction: column;
+    width: 100%;
   }
 
   .btn {

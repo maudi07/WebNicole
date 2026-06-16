@@ -41,6 +41,45 @@
       </div>
     </section>
 
+    <section class="card company-card">
+      <div class="section-title">
+        <div>
+          <p class="tag">Empresa</p>
+          <h2>Datos para los reportes y PDF</h2>
+        </div>
+        <div id="empresaVista" class="company-preview"></div>
+      </div>
+
+      <form id="formEmpresa" class="form-grid empresa-grid">
+        <label>
+          Nombre de la empresa
+          <input type="text" id="empresaNombre" placeholder="Ejemplo: El Sol S.A." required>
+        </label>
+        <label>
+          RFC
+          <input type="text" id="empresaRfc" placeholder="Opcional">
+        </label>
+        <label>
+          Periodo inicial
+          <input type="date" id="empresaPeriodoInicio">
+        </label>
+        <label>
+          Periodo final
+          <input type="date" id="empresaPeriodoFin">
+        </label>
+        <label>
+          Responsable
+          <input type="text" id="empresaResponsable" placeholder="Opcional">
+        </label>
+        <label class="wide-field">
+          Domicilio
+          <input type="text" id="empresaDomicilio" placeholder="Opcional">
+        </label>
+        <button class="btn primary" type="submit">Guardar empresa</button>
+      </form>
+      <p id="mensajeEmpresa" class="mensaje"></p>
+    </section>
+
     <section class="grid cards-4">
       <article class="card mini-card">
         <span class="icon">📒</span>

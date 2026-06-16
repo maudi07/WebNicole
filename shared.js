@@ -1,6 +1,17 @@
-// Sistema básico de estados financieros con localStorage
+// Lógica principal de LunaConta
 const CLAVE_CUENTAS = "contaPastel_cuentas";
 const CLAVE_ASIENTOS = "contaPastel_asientos";
+const CLAVE_EMPRESA = "lunaconta_empresa";
+
+const empresaInicial = {
+  nombre: "Mi empresa",
+  rfc: "",
+  domicilio: "",
+  periodo: "Periodo actual",
+  periodoInicio: "",
+  periodoFin: "",
+  responsable: ""
+};
 
 const cuentasIniciales = [
   { codigo: "1001", nombre: "Caja", tipo: "Activo", subtipo: "", naturaleza: "Deudora" },
@@ -50,6 +61,10 @@ function prepararDatosIniciales() {
   if (!localStorage.getItem(CLAVE_ASIENTOS)) {
     guardarAsientos([]);
   }
+
+  if (!localStorage.getItem(CLAVE_EMPRESA)) {
+    guardarEmpresa(empresaInicial);
+  }
 }
 
 function prepararMenu() {
@@ -69,6 +84,42 @@ function prepararMenu() {
       menu.classList.toggle("open");
     });
   }
+}
+
+function obtenerEmpresa() {
+  return JSON.parse(localStorage.getItem(CLAVE_EMPRESA)) || empresaInicial;
+}
+
+function guardarEmpresa(empresa) {
+  localStorage.setItem(CLAVE_EMPRESA, JSON.stringify(empresa));
+}
+
+function obtenerTextoPeriodoEmpresa(empresa) {
+  const inicio = empresa.periodoInicio || "";
+  const fin = empresa.periodoFin || "";
+
+  if (inicio && fin) {
+    return "Periodo del " + formatearFechaCorta(inicio) + " al " + formatearFechaCorta(fin);
+  }
+
+  if (inicio) {
+    return "Periodo desde " + formatearFechaCorta(inicio);
+  }
+
+  if (fin) {
+    return "Periodo hasta " + formatearFechaCorta(fin);
+  }
+
+  return empresa.periodo || "Periodo actual";
+}
+
+function formatearFechaCorta(fecha) {
+  if (!fecha) return "";
+
+  const partes = fecha.split("-");
+  if (partes.length !== 3) return fecha;
+
+  return partes[2] + "/" + partes[1] + "/" + partes[0];
 }
 
 function obtenerCuentas() {
@@ -227,8 +278,56 @@ function crearOpcionesCuentas() {
   return opciones;
 }
 
+// Datos de la empresa
+function prepararFormularioEmpresa() {
+  const form = document.getElementById("formEmpresa");
+  if (!form) return;
+
+  const empresa = obtenerEmpresa();
+  document.getElementById("empresaNombre").value = empresa.nombre || "";
+  document.getElementById("empresaRfc").value = empresa.rfc || "";
+  document.getElementById("empresaDomicilio").value = empresa.domicilio || "";
+  document.getElementById("empresaPeriodoInicio").value = empresa.periodoInicio || "";
+  document.getElementById("empresaPeriodoFin").value = empresa.periodoFin || "";
+  document.getElementById("empresaResponsable").value = empresa.responsable || "";
+  actualizarVistaEmpresa();
+
+  form.addEventListener("submit", function (evento) {
+    evento.preventDefault();
+
+    const nuevaEmpresa = {
+      nombre: document.getElementById("empresaNombre").value.trim() || "Mi empresa",
+      rfc: document.getElementById("empresaRfc").value.trim(),
+      domicilio: document.getElementById("empresaDomicilio").value.trim(),
+      periodoInicio: document.getElementById("empresaPeriodoInicio").value,
+      periodoFin: document.getElementById("empresaPeriodoFin").value,
+      responsable: document.getElementById("empresaResponsable").value.trim()
+    };
+
+    nuevaEmpresa.periodo = obtenerTextoPeriodoEmpresa(nuevaEmpresa);
+
+    guardarEmpresa(nuevaEmpresa);
+    actualizarVistaEmpresa();
+    mostrarMensaje(document.getElementById("mensajeEmpresa"), "Datos de empresa guardados correctamente.", "ok");
+  });
+}
+
+function actualizarVistaEmpresa() {
+  const vista = document.getElementById("empresaVista");
+  if (!vista) return;
+
+  const empresa = obtenerEmpresa();
+  vista.innerHTML = `
+    <strong>${limpiarTextoHTML(empresa.nombre || "Mi empresa")}</strong>
+    <span>${limpiarTextoHTML(obtenerTextoPeriodoEmpresa(empresa))}</span>
+    <span>${empresa.rfc ? "RFC: " + limpiarTextoHTML(empresa.rfc) : "RFC no capturado"}</span>
+  `;
+}
+
 // Inicio
 function iniciarInicio() {
+  prepararFormularioEmpresa();
+
   const cuentas = obtenerCuentas();
   const asientos = obtenerAsientos();
   const movimientos = obtenerMovimientos();
@@ -1009,5 +1108,381 @@ function crearTarjetaResultado(titulo, total, items, clase) {
         ${filas}
       </div>
     </article>
+  `;
+}
+
+
+// Generación de reportes para imprimir o guardar como PDF
+function generarPDF(tipoReporte) {
+  const empresa = obtenerEmpresa();
+  const titulo = obtenerTituloReporte(tipoReporte);
+  const contenido = crearContenidoPDF(tipoReporte);
+  const fecha = new Date().toLocaleDateString("es-MX");
+  const ventana = window.open("", "_blank");
+
+  if (!ventana) {
+    alert("El navegador bloqueó la ventana del PDF. Permite ventanas emergentes para esta página.");
+    return;
+  }
+
+  ventana.document.write(`
+    <!DOCTYPE html>
+    <html lang="es">
+    <head>
+      <meta charset="UTF-8">
+      <title>${limpiarTextoHTML(titulo)}</title>
+      <style>
+        * { box-sizing: border-box; }
+        body { font-family: Arial, Helvetica, sans-serif; margin: 28px; color: #1f2937; }
+        .pdf-header { text-align: center; border-bottom: 3px solid #8e73d5; padding-bottom: 16px; margin-bottom: 24px; }
+        .pdf-header h1 { margin: 0; font-size: 28px; color: #2f3343; }
+        .pdf-header h2 { margin: 10px 0 6px; font-size: 20px; color: #8e73d5; }
+        .pdf-header p { margin: 3px 0; color: #606b80; font-size: 13px; }
+        .pdf-info { display: flex; justify-content: space-between; gap: 12px; margin: 12px 0 22px; font-size: 13px; color: #606b80; }
+        .pdf-section { margin-bottom: 24px; page-break-inside: avoid; }
+        .pdf-section h3 { margin: 0 0 10px; padding: 9px 12px; background: #f0e9ff; color: #3b3156; border-radius: 8px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 12px; }
+        th, td { border: 1px solid #d9d4df; padding: 8px; text-align: left; vertical-align: top; }
+        th { background: #fbf7ff; color: #4b445e; text-transform: uppercase; font-size: 11px; }
+        tfoot th, tfoot td { background: #f2fbf6; font-weight: bold; }
+        .right { text-align: right; white-space: nowrap; }
+        .total-box { display: flex; justify-content: space-between; padding: 10px 12px; margin-top: 8px; border-radius: 8px; background: #f7f2ff; font-weight: bold; }
+        .grand { background: #eaf8ff; }
+        .result-box { padding: 12px; border: 1px solid #d9d4df; border-radius: 10px; margin-top: 10px; }
+        .ok { color: #2b7a4b; font-weight: bold; }
+        .error { color: #a64242; font-weight: bold; }
+        .firma { margin-top: 50px; display: flex; justify-content: center; }
+        .firma div { width: 260px; border-top: 1px solid #555; text-align: center; padding-top: 8px; color: #606b80; }
+        @page { margin: 18mm; }
+        @media print { body { margin: 0; } button { display: none; } }
+      </style>
+    </head>
+    <body>
+      <header class="pdf-header">
+        <h1>${limpiarTextoHTML(empresa.nombre || "Mi empresa")}</h1>
+        <h2>${limpiarTextoHTML(titulo)}</h2>
+        <p>${limpiarTextoHTML(obtenerTextoPeriodoEmpresa(empresa))}</p>
+        ${empresa.rfc ? `<p>RFC: ${limpiarTextoHTML(empresa.rfc)}</p>` : ""}
+        ${empresa.domicilio ? `<p>${limpiarTextoHTML(empresa.domicilio)}</p>` : ""}
+      </header>
+      <div class="pdf-info">
+        <span>Fecha de elaboración: ${fecha}</span>
+        <span>Generado en LunaConta</span>
+      </div>
+      ${contenido}
+      ${empresa.responsable ? `<div class="firma"><div>${limpiarTextoHTML(empresa.responsable)}<br>Responsable</div></div>` : ""}
+      <script>
+        window.onload = function () {
+          setTimeout(function () { window.print(); }, 300);
+        };
+      <\/script>
+    </body>
+    </html>
+  `);
+
+  ventana.document.close();
+}
+
+function obtenerTituloReporte(tipoReporte) {
+  if (tipoReporte === "catalogo") return "Catálogo de cuentas";
+  if (tipoReporte === "diario") return "Libro diario";
+  if (tipoReporte === "mayor") return "Libro mayor";
+  if (tipoReporte === "balanza") return "Balanza de comprobación";
+  if (tipoReporte === "balance") return "Balance general";
+  if (tipoReporte === "estados") return "Estado de resultado integral";
+  return "Reporte contable";
+}
+
+function crearContenidoPDF(tipoReporte) {
+  if (tipoReporte === "catalogo") return pdfCatalogo();
+  if (tipoReporte === "diario") return pdfDiario();
+  if (tipoReporte === "mayor") return pdfMayor();
+  if (tipoReporte === "balanza") return pdfBalanza();
+  if (tipoReporte === "balance") return pdfBalanceGeneral();
+  if (tipoReporte === "estados") return pdfResultadoIntegral();
+  return `<p>No se encontró información para este reporte.</p>`;
+}
+
+function limpiarTextoHTML(texto) {
+  return String(texto || "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+function pdfCatalogo() {
+  const cuentas = ordenarCuentas(obtenerCuentas());
+  let filas = "";
+
+  cuentas.forEach(function (cuenta) {
+    filas += `
+      <tr>
+        <td>${limpiarTextoHTML(cuenta.codigo)}</td>
+        <td>${limpiarTextoHTML(cuenta.nombre)}</td>
+        <td>${limpiarTextoHTML(cuenta.tipo)}</td>
+        <td>${limpiarTextoHTML(cuenta.subtipo || "-")}</td>
+        <td>${limpiarTextoHTML(cuenta.naturaleza)}</td>
+      </tr>
+    `;
+  });
+
+  return `
+    <section class="pdf-section">
+      <h3>Cuentas registradas</h3>
+      <table>
+        <thead><tr><th>Código</th><th>Cuenta</th><th>Tipo</th><th>Subtipo</th><th>Naturaleza</th></tr></thead>
+        <tbody>${filas || `<tr><td colspan="5">Sin cuentas registradas.</td></tr>`}</tbody>
+      </table>
+    </section>
+  `;
+}
+
+function pdfDiario() {
+  const asientos = ordenarAsientos(obtenerAsientos());
+  if (asientos.length === 0) return `<p>No hay asientos registrados.</p>`;
+
+  let html = "";
+  asientos.forEach(function (asiento, indice) {
+    let filas = "";
+    let totalDebe = 0;
+    let totalHaber = 0;
+
+    asiento.movimientos.forEach(function (mov) {
+      totalDebe += numero(mov.debe);
+      totalHaber += numero(mov.haber);
+      filas += `
+        <tr>
+          <td>${limpiarTextoHTML(mov.codigo)}</td>
+          <td>${limpiarTextoHTML(mov.nombre)}</td>
+          <td class="right">${mov.debe > 0 ? dinero(mov.debe) : "-"}</td>
+          <td class="right">${mov.haber > 0 ? dinero(mov.haber) : "-"}</td>
+        </tr>
+      `;
+    });
+
+    html += `
+      <section class="pdf-section">
+        <h3>Asiento ${indice + 1}: ${limpiarTextoHTML(asiento.descripcion)}</h3>
+        <p><strong>Fecha:</strong> ${limpiarTextoHTML(asiento.fecha)} &nbsp; <strong>Partida:</strong> ${limpiarTextoHTML(asiento.id)}</p>
+        <table>
+          <thead><tr><th>Código</th><th>Cuenta</th><th>Debe</th><th>Haber</th></tr></thead>
+          <tbody>${filas}</tbody>
+          <tfoot><tr><th colspan="2">Totales</th><th class="right">${dinero(totalDebe)}</th><th class="right">${dinero(totalHaber)}</th></tr></tfoot>
+        </table>
+      </section>
+    `;
+  });
+
+  return html;
+}
+
+function pdfMayor() {
+  const resumen = resumenPorCuenta().filter(function (item) {
+    return item.movimientos.length > 0;
+  });
+
+  if (resumen.length === 0) return `<p>No hay movimientos registrados.</p>`;
+
+  let html = "";
+  resumen.forEach(function (item) {
+    let saldo = 0;
+    let filas = "";
+    const saldoFinal = item.cuenta.naturaleza === "Deudora" ? item.debe - item.haber : item.haber - item.debe;
+
+    item.movimientos
+      .sort(function (a, b) { return a.fecha.localeCompare(b.fecha); })
+      .forEach(function (mov) {
+        if (item.cuenta.naturaleza === "Deudora") {
+          saldo += mov.debe - mov.haber;
+        } else {
+          saldo += mov.haber - mov.debe;
+        }
+
+        filas += `
+          <tr>
+            <td>${limpiarTextoHTML(mov.fecha)}</td>
+            <td>${limpiarTextoHTML(mov.descripcion)}</td>
+            <td class="right">${mov.debe > 0 ? dinero(mov.debe) : "-"}</td>
+            <td class="right">${mov.haber > 0 ? dinero(mov.haber) : "-"}</td>
+            <td class="right">${dinero(saldo)}</td>
+          </tr>
+        `;
+      });
+
+    html += `
+      <section class="pdf-section">
+        <h3>${limpiarTextoHTML(item.cuenta.codigo)} - ${limpiarTextoHTML(item.cuenta.nombre)}</h3>
+        <p><strong>Tipo:</strong> ${limpiarTextoHTML(item.cuenta.tipo)} &nbsp; <strong>Naturaleza:</strong> ${limpiarTextoHTML(item.cuenta.naturaleza)} &nbsp; <strong>Saldo final:</strong> ${dinero(saldoFinal)}</p>
+        <table>
+          <thead><tr><th>Fecha</th><th>Descripción</th><th>Debe</th><th>Haber</th><th>Saldo</th></tr></thead>
+          <tbody>${filas}</tbody>
+          <tfoot><tr><th colspan="2">Totales</th><th class="right">${dinero(item.debe)}</th><th class="right">${dinero(item.haber)}</th><th class="right">${dinero(saldoFinal)}</th></tr></tfoot>
+        </table>
+      </section>
+    `;
+  });
+
+  return html;
+}
+
+function pdfBalanza() {
+  const resumen = resumenPorCuenta().filter(function (item) {
+    return item.debe > 0 || item.haber > 0;
+  });
+
+  let totalDebe = 0;
+  let totalHaber = 0;
+  let totalSaldoDeudor = 0;
+  let totalSaldoAcreedor = 0;
+  let filas = "";
+
+  resumen.forEach(function (item) {
+    totalDebe += item.debe;
+    totalHaber += item.haber;
+    totalSaldoDeudor += item.saldoDeudor;
+    totalSaldoAcreedor += item.saldoAcreedor;
+
+    filas += `
+      <tr>
+        <td>${limpiarTextoHTML(item.cuenta.codigo)}</td>
+        <td>${limpiarTextoHTML(item.cuenta.nombre)}</td>
+        <td class="right">${dinero(item.debe)}</td>
+        <td class="right">${dinero(item.haber)}</td>
+        <td class="right">${item.saldoDeudor ? dinero(item.saldoDeudor) : "-"}</td>
+        <td class="right">${item.saldoAcreedor ? dinero(item.saldoAcreedor) : "-"}</td>
+      </tr>
+    `;
+  });
+
+  const cuadra = Math.abs(totalDebe - totalHaber) < 0.01 && Math.abs(totalSaldoDeudor - totalSaldoAcreedor) < 0.01;
+
+  return `
+    <section class="pdf-section">
+      <table>
+        <thead><tr><th>Código</th><th>Cuenta</th><th>Debe</th><th>Haber</th><th>Saldo deudor</th><th>Saldo acreedor</th></tr></thead>
+        <tbody>${filas || `<tr><td colspan="6">Sin movimientos registrados.</td></tr>`}</tbody>
+        <tfoot><tr><th colspan="2">Totales</th><th class="right">${dinero(totalDebe)}</th><th class="right">${dinero(totalHaber)}</th><th class="right">${dinero(totalSaldoDeudor)}</th><th class="right">${dinero(totalSaldoAcreedor)}</th></tr></tfoot>
+      </table>
+      <p class="${cuadra ? "ok" : "error"}">${cuadra ? "La balanza cuadra correctamente." : "La balanza no cuadra."}</p>
+    </section>
+  `;
+}
+
+function pdfBalanceGeneral() {
+  const totales = obtenerTotalesBalance();
+  const activo = crearFilasReportePDF("Activo");
+  const pasivo = crearFilasReportePDF("Pasivo");
+  const capital = crearFilasReportePDF("Capital", true);
+  const diferencia = totales.activo - totales.pasivoCapital;
+
+  return `
+    <section class="pdf-section">
+      <h3>Activo</h3>
+      <table><tbody>${activo || `<tr><td>Sin movimientos</td><td class="right">${dinero(0)}</td></tr>`}</tbody></table>
+      <div class="total-box"><span>Total activo</span><strong>${dinero(totales.activo)}</strong></div>
+    </section>
+    <section class="pdf-section">
+      <h3>Pasivo</h3>
+      <table><tbody>${pasivo || `<tr><td>Sin movimientos</td><td class="right">${dinero(0)}</td></tr>`}</tbody></table>
+      <div class="total-box"><span>Total pasivo</span><strong>${dinero(totales.pasivo)}</strong></div>
+    </section>
+    <section class="pdf-section">
+      <h3>Capital</h3>
+      <table><tbody>${capital || `<tr><td>Sin movimientos</td><td class="right">${dinero(0)}</td></tr>`}</tbody></table>
+      <div class="total-box"><span>Total capital</span><strong>${dinero(totales.capital)}</strong></div>
+      <div class="total-box grand"><span>Pasivo + Capital</span><strong>${dinero(totales.pasivoCapital)}</strong></div>
+      <p class="${Math.abs(diferencia) < 0.01 ? "ok" : "error"}">${Math.abs(diferencia) < 0.01 ? "Correcto: Activo = Pasivo + Capital." : "Diferencia: " + dinero(diferencia)}</p>
+    </section>
+  `;
+}
+
+function crearFilasReportePDF(tipo, incluirResultado) {
+  const cuentas = ordenarCuentas(obtenerCuentas()).filter(function (cuenta) {
+    return cuenta.tipo === tipo;
+  });
+
+  let filas = "";
+  cuentas.forEach(function (cuenta) {
+    const saldo = saldoParaReporte(cuenta);
+    if (Math.abs(saldo) < 0.01) return;
+    filas += `<tr><td>${limpiarTextoHTML(cuenta.codigo)} - ${limpiarTextoHTML(cuenta.nombre)}</td><td class="right">${dinero(saldo)}</td></tr>`;
+  });
+
+  if (incluirResultado) {
+    const resultado = calcularResultadoPeriodo();
+    if (Math.abs(resultado) >= 0.01) {
+      filas += `<tr><td>Utilidad o pérdida del periodo</td><td class="right">${dinero(resultado)}</td></tr>`;
+    }
+  }
+
+  return filas;
+}
+
+function pdfResultadoIntegral() {
+  const ingresos = obtenerCategoriaResultado(function (cuenta) {
+    return cuenta.tipo === "Ingreso" && cuenta.subtipo === "";
+  });
+
+  const otrosIngresos = obtenerCategoriaResultado(function (cuenta) {
+    return cuenta.tipo === "Ingreso" && cuenta.subtipo === "Otros ingresos";
+  });
+
+  const costoVentas = obtenerCategoriaResultado(function (cuenta) {
+    return cuentaEsCostoDeVentas(cuenta);
+  });
+
+  const gastosVenta = obtenerCategoriaResultado(function (cuenta) {
+    return cuenta.tipo === "Gasto" && cuenta.subtipo === "Gastos de venta" && !cuentaEsCostoDeVentas(cuenta);
+  });
+
+  const gastosAdmin = obtenerCategoriaResultado(function (cuenta) {
+    return cuenta.tipo === "Gasto" && cuenta.subtipo === "Gastos de administración";
+  });
+
+  const otrosGastos = obtenerCategoriaResultado(function (cuenta) {
+    return cuenta.tipo === "Gasto" && cuenta.subtipo === "Otros gastos" && !cuentaEsCostoDeVentas(cuenta);
+  });
+
+  const totalIngresos = ingresos.total + otrosIngresos.total;
+  const utilidadBruta = ingresos.total - costoVentas.total;
+  const utilidadOperacion = utilidadBruta - gastosVenta.total - gastosAdmin.total;
+  const utilidadAntesImpuestos = utilidadOperacion + otrosIngresos.total - otrosGastos.total;
+  const utilidadNeta = utilidadAntesImpuestos;
+  const margen = totalIngresos > 0 ? (utilidadNeta / totalIngresos) * 100 : 0;
+
+  return `
+    ${crearSeccionResultadoPDF("Ingresos", ingresos)}
+    ${crearSeccionResultadoPDF("Costo de ventas", costoVentas)}
+    <div class="total-box"><span>Utilidad bruta</span><strong>${dinero(utilidadBruta)}</strong></div>
+    ${crearSeccionResultadoPDF("Otros ingresos", otrosIngresos)}
+    ${crearSeccionResultadoPDF("Gastos de venta", gastosVenta)}
+    ${crearSeccionResultadoPDF("Gastos de administración", gastosAdmin)}
+    ${crearSeccionResultadoPDF("Otros gastos", otrosGastos)}
+    <section class="pdf-section result-box">
+      <div class="total-box"><span>Utilidad de operación</span><strong>${dinero(utilidadOperacion)}</strong></div>
+      <div class="total-box"><span>Utilidad antes de impuestos</span><strong>${dinero(utilidadAntesImpuestos)}</strong></div>
+      <div class="total-box grand"><span>${utilidadNeta >= 0 ? "Utilidad neta" : "Pérdida neta"}</span><strong>${dinero(utilidadNeta)}</strong></div>
+      <div class="total-box"><span>Margen neto</span><strong>${margen.toFixed(1)}%</strong></div>
+    </section>
+  `;
+}
+
+function crearSeccionResultadoPDF(titulo, datos) {
+  let filas = "";
+
+  datos.items.forEach(function (item) {
+    filas += `<tr><td>${limpiarTextoHTML(item.codigo)} - ${limpiarTextoHTML(item.nombre)}</td><td class="right">${dinero(item.saldo)}</td></tr>`;
+  });
+
+  return `
+    <section class="pdf-section">
+      <h3>${limpiarTextoHTML(titulo)}</h3>
+      <table>
+        <tbody>${filas || `<tr><td>Sin movimientos</td><td class="right">${dinero(0)}</td></tr>`}</tbody>
+        <tfoot><tr><th>Total ${limpiarTextoHTML(titulo.toLowerCase())}</th><th class="right">${dinero(datos.total)}</th></tr></tfoot>
+      </table>
+    </section>
   `;
 }
