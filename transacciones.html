@@ -78,6 +78,23 @@
         </div>
       </form>
     </section>
+
+    <section class="card control-asientos-card">
+      <div class="section-title">
+        <div>
+          <p class="tag">Control</p>
+          <h2>Asientos guardados</h2>
+          <p class="text-muted">Esta opción borra solamente los asientos registrados. No elimina cuentas ni datos de la empresa.</p>
+        </div>
+        <div class="control-count">
+          <span>Total registrados</span>
+          <strong id="contadorAsientosGuardados">0</strong>
+        </div>
+      </div>
+      <button type="button" class="btn danger" onclick="borrarTodosLosAsientos()">Borrar solo asientos registrados</button>
+      <p id="mensajeControlAsientos" class="mensaje"></p>
+    </section>
+
   </main>
 
   <script src="shared.js"></script>

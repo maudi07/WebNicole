@@ -515,6 +515,7 @@ function iniciarTransacciones() {
   const fecha = document.getElementById("fechaAsiento");
   const form = document.getElementById("formAsiento");
 
+  actualizarControlAsientos();
   fecha.valueAsDate = new Date();
   agregarMovimiento();
   agregarMovimiento();
@@ -663,6 +664,7 @@ function guardarAsientoNuevo() {
 
   guardarAsientos(asientos);
   limpiarAsiento();
+  actualizarControlAsientos();
   mostrarMensaje(mensaje, "Asiento guardado correctamente.", "ok");
 }
 
@@ -673,6 +675,58 @@ function limpiarAsiento() {
   agregarMovimiento();
   agregarMovimiento();
   calcularTotalesAsiento();
+}
+
+function actualizarControlAsientos() {
+  const contador = document.getElementById("contadorAsientosGuardados");
+  if (!contador) return;
+
+  contador.textContent = obtenerAsientos().length;
+}
+
+function borrarTodosLosAsientos() {
+  const total = obtenerAsientos().length;
+
+  if (total === 0) {
+    alert("No hay asientos registrados para borrar.");
+    return;
+  }
+
+  const seguro = confirm("Se borrarán solamente los asientos registrados. Las cuentas y los datos de empresa se conservarán. ¿Deseas continuar?");
+  if (!seguro) return;
+
+  guardarAsientos([]);
+
+  const mensaje = document.getElementById("mensajeControlAsientos");
+  if (mensaje) {
+    actualizarControlAsientos();
+    mostrarMensaje(mensaje, "Asientos borrados correctamente. Las cuentas se conservaron.", "ok");
+    return;
+  }
+
+  location.reload();
+}
+
+function eliminarAsiento(idAsiento) {
+  const asientos = obtenerAsientos();
+  const asiento = asientos.find(function (item) {
+    return String(item.id) === String(idAsiento);
+  });
+
+  if (!asiento) {
+    alert("No se encontró el asiento seleccionado.");
+    return;
+  }
+
+  const seguro = confirm("¿Eliminar este asiento: " + asiento.descripcion + "? Esta acción solo borra este registro y sus movimientos.");
+  if (!seguro) return;
+
+  const asientosActualizados = asientos.filter(function (item) {
+    return String(item.id) !== String(idAsiento);
+  });
+
+  guardarAsientos(asientosActualizados);
+  location.reload();
 }
 
 // Libro diario
@@ -723,6 +777,7 @@ function iniciarDiario() {
           <div class="journal-info">
             <span>Partida #${asiento.id}</span>
             <strong>${asiento.movimientos.length} movimientos</strong>
+            <button type="button" class="remove-btn journal-delete" onclick="eliminarAsiento('${asiento.id}')">Eliminar asiento</button>
           </div>
         </div>
 

@@ -29,7 +29,10 @@
         <h1>Libro diario</h1>
         <p>Cada asiento aparece en una tarjeta independiente con sus totales.</p>
       </div>
-      <button class="btn secondary" onclick="generarPDF('diario')">Generar PDF</button>
+      <div class="page-actions">
+        <button class="btn secondary" onclick="generarPDF('diario')">Generar PDF</button>
+        <button class="btn danger" onclick="borrarTodosLosAsientos()">Borrar asientos</button>
+      </div>
     </section>
 
     <section id="contenedorDiario" class="journal-list"></section>

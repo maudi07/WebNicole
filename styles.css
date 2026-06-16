@@ -990,3 +990,53 @@ tfoot th {
     font-size: 30px;
   }
 }
+
+/* Control para borrar solamente asientos */
+.control-asientos-card {
+  margin-top: 24px;
+}
+
+.text-muted {
+  margin: 8px 0 0;
+  color: var(--suave);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.control-count {
+  display: grid;
+  gap: 5px;
+  min-width: 150px;
+  padding: 14px 16px;
+  border-radius: 18px;
+  background: #f7f2ff;
+  text-align: center;
+}
+
+.control-count span {
+  color: var(--suave);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.control-count strong {
+  color: var(--morado-fuerte);
+  font-size: 28px;
+}
+
+.journal-delete {
+  justify-self: end;
+  width: fit-content;
+  margin-top: 6px;
+}
+
+@media (max-width: 720px) {
+  .control-count {
+    width: 100%;
+    text-align: left;
+  }
+
+  .journal-delete {
+    justify-self: start;
+  }
+}
