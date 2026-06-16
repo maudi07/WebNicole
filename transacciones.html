@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Registro de asientos</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body data-page="transacciones">
+  <header class="topbar">
+    <a class="logo" href="index.html">LunaConta</a>
+    <button class="menu-btn" id="menuBtn">☰</button>
+    <nav class="menu" id="menu">
+      <a href="index.html" data-link="inicio">Inicio</a>
+      <a href="catalogo.html" data-link="catalogo">Catálogo</a>
+      <a href="transacciones.html" data-link="transacciones">Asientos</a>
+      <a href="diario.html" data-link="diario">Libro diario</a>
+      <a href="mayor.html" data-link="mayor">Libro mayor</a>
+      <a href="balanza.html" data-link="balanza">Balanza</a>
+      <a href="balance.html" data-link="balance">Balance general</a>
+      <a href="estados.html" data-link="estados">Resultado integral</a>
+    </nav>
+  </header>
+
+  <main class="container">
+    <section class="page-head">
+      <div>
+        <p class="tag">Partida doble</p>
+        <h1>Registro de asientos contables</h1>
+        <p>El asiento solo se guarda si el total del Debe es igual al total del Haber.</p>
+      </div>
+    </section>
+
+    <section class="card">
+      <form id="formAsiento">
+        <div class="form-grid two">
+          <label>
+            Fecha
+            <input type="date" id="fechaAsiento" required>
+          </label>
+          <label>
+            Descripción
+            <input type="text" id="descripcionAsiento" placeholder="Ejemplo: Venta de mercancía" required>
+          </label>
+        </div>
+
+        <div class="section-title compact">
+          <h2>Movimientos</h2>
+          <button type="button" class="btn small" id="btnAgregarMovimiento">Agregar movimiento</button>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Cuenta</th>
+                <th>Debe</th>
+                <th>Haber</th>
+                <th>Quitar</th>
+              </tr>
+            </thead>
+            <tbody id="tablaMovimientos"></tbody>
+            <tfoot>
+              <tr>
+                <th>Total</th>
+                <th id="totalDebeAsiento">$0.00</th>
+                <th id="totalHaberAsiento">$0.00</th>
+                <th></th>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+
+        <p id="mensajeAsiento" class="mensaje"></p>
+        <div class="actions-right">
+          <button type="button" class="btn secondary" id="btnLimpiarAsiento">Limpiar</button>
+          <button type="submit" class="btn primary">Guardar asiento</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="card control-asientos-card">
+      <div class="section-title">
+        <div>
+          <p class="tag">Control</p>
+          <h2>Asientos guardados</h2>
+          <p class="text-muted">Esta opción borra solamente los asientos registrados. No elimina cuentas ni datos de la empresa.</p>
+        </div>
+        <div class="control-count">
+          <span>Total registrados</span>
+          <strong id="contadorAsientosGuardados">0</strong>
+        </div>
+      </div>
+      <button type="button" class="btn danger" onclick="borrarTodosLosAsientos()">Borrar solo asientos registrados</button>
+      <p id="mensajeControlAsientos" class="mensaje"></p>
+    </section>
+
+  </main>
+
+  <script src="shared.js"></script>
+</body>
+</html>

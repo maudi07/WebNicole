@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Libro diario</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body data-page="diario">
+  <header class="topbar">
+    <a class="logo" href="index.html">LunaConta</a>
+    <button class="menu-btn" id="menuBtn">☰</button>
+    <nav class="menu" id="menu">
+      <a href="index.html" data-link="inicio">Inicio</a>
+      <a href="catalogo.html" data-link="catalogo">Catálogo</a>
+      <a href="transacciones.html" data-link="transacciones">Asientos</a>
+      <a href="diario.html" data-link="diario">Libro diario</a>
+      <a href="mayor.html" data-link="mayor">Libro mayor</a>
+      <a href="balanza.html" data-link="balanza">Balanza</a>
+      <a href="balance.html" data-link="balance">Balance general</a>
+      <a href="estados.html" data-link="estados">Resultado integral</a>
+    </nav>
+  </header>
+
+  <main class="container">
+    <section class="page-head">
+      <div>
+        <p class="tag">Registro cronológico</p>
+        <h1>Libro diario</h1>
+        <p>Cada asiento aparece en una tarjeta independiente con sus totales.</p>
+      </div>
+      <div class="page-actions">
+        <button class="btn secondary" onclick="generarPDF('diario')">Generar PDF</button>
+        <button class="btn danger" onclick="borrarTodosLosAsientos()">Borrar asientos</button>
+      </div>
+    </section>
+
+    <section id="contenedorDiario" class="journal-list"></section>
+  </main>
+
+  <script src="shared.js"></script>
+</body>
+</html>
